@@ -9,38 +9,6 @@ class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final GoogleSignIn _googleSignIn = GoogleSignIn();
 
-  // Sign in anonymously
-
-  //This methode is not used in the app but it is a good example of how to sign in anonymously
-  Future<void> signInAnonymously() async {
-    try {
-      final userCredential = await _auth.signInAnonymously();
-      final user = userCredential.user;
-      if (user != null) {
-        print('Signed in anonymously: ${user.uid}');
-      }
-    } catch (e) {
-      print('Error signing in anonymously: $e');
-    }
-  }
-
-  //sign in anonymously with auth exceptions ( this is the one used in the app)
-  Future<void> signInAnonymouslywithExceptions() async {
-    try {
-      final userCredential = await _auth.signInAnonymously();
-      final user = userCredential.user;
-      if (user != null) {
-        print('Signed in anonymously: ${user.uid}');
-      }
-    } on FirebaseAuthException catch (e) {
-      print(
-          'Error signing in anonymously: ${mapFirebaseAuthExceptionCode(e.code)}');
-      throw Exception(mapFirebaseAuthExceptionCode(e.code));
-    } catch (e) {
-      print('Error signing in anonymously: $e');
-    }
-  }
-
   // Sign out
   //This methode will sign out the user and print a message to the console
   Future<void> signOut() async {
@@ -102,13 +70,13 @@ class AuthService {
 
   //sign in with google
   //This methode will sign in the user with google
-  Future<void> signInWithGoogle() async {
+  Future<UserCredential?> signInWithGoogle() async {
     try {
       // Trigger the Google Sign In process
       final googleUser = await _googleSignIn.signIn();
       if (googleUser == null) {
-        // User canceled the sign-in
-        return;
+        // User canceled the sign-in - throw an exception or return null
+        throw Exception('Google sign-in was cancelled by user');
       }
 
       // Obtain the GoogleSignInAuthentication object
@@ -134,7 +102,7 @@ class AuthService {
           'imageUrl': user.photoURL ?? '',
           'createdAt': Timestamp.fromDate(DateTime.now()),
           'updatedAt': Timestamp.fromDate(DateTime.now()),
-          'password': '', // Password is not needed for Google sign-in
+          'password': '',
           'followers': 0,
         };
 
@@ -143,28 +111,15 @@ class AuthService {
             FirebaseFirestore.instance.collection('users').doc(user.uid);
         await userDocRef.set(userData);
       }
+
+      return userCredential;
     } on FirebaseAuthException catch (e) {
       print(
           'Error signing in with Google: ${mapFirebaseAuthExceptionCode(e.code)}');
       throw Exception(mapFirebaseAuthExceptionCode(e.code));
     } catch (e) {
       print('Error signing in with Google: $e');
-    }
-  }
-
-  //github sign in
-  //This methode will sign in the user with github
-  Future<void> signInWithGitHub() async {
-    try {
-      // Trigger the GitHub Sign In process here the user will be redirected to the github page to sign in , this is done by the githubAuthProvider and the auth package from firebase
-      GithubAuthProvider githubAuthProvider = GithubAuthProvider();
-      await FirebaseAuth.instance.signInWithProvider(githubAuthProvider);
-    } on FirebaseAuthException catch (e) {
-      print(
-          'Error signing in with GitHub: ${mapFirebaseAuthExceptionCode(e.code)}');
-      throw Exception(mapFirebaseAuthExceptionCode(e.code));
-    } catch (e) {
-      print('Error signing in with GitHub: $e');
+      rethrow;
     }
   }
 
