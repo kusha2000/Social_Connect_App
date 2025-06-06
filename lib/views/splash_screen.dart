@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:social_connect/utils/app_constants/colors.dart';
-import 'package:go_router/go_router.dart'; // Add this import
+import 'package:go_router/go_router.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({Key? key}) : super(key: key);
@@ -119,10 +119,8 @@ class _SplashScreenState extends State<SplashScreen>
   }
 
   void _navigateToMainScreen() {
-    // Updated to use GoRouter instead of Navigator
     if (mounted) {
-      context.go(
-          '/'); // This will go to the wrapper route which handles auth state
+      context.go('/');
     }
   }
 
@@ -138,6 +136,35 @@ class _SplashScreenState extends State<SplashScreen>
 
   @override
   Widget build(BuildContext context) {
+    // Get theme-aware colors
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
+
+    // Use appropriate color sets based on theme
+    final backgroundColors = isDark
+        ? [
+            DarkThemeColors.background,
+            DarkThemeColors.surface,
+            DarkThemeColors.surfaceVariant,
+            DarkThemeColors.primary.withOpacity(0.1),
+          ]
+        : [
+            LightThemeColors.background,
+            LightThemeColors.surface,
+            LightThemeColors.surfaceVariant,
+            LightThemeColors.primary.withOpacity(0.1),
+          ];
+
+    final primaryColor = colorScheme.primary;
+    final secondaryColor = colorScheme.secondary;
+    final accentColor =
+        isDark ? DarkThemeColors.accent1 : LightThemeColors.accent1;
+    final textSecondary =
+        isDark ? DarkThemeColors.textSecondary : LightThemeColors.textSecondary;
+    final textHint =
+        isDark ? DarkThemeColors.textHint : LightThemeColors.textHint;
+
     return Scaffold(
       body: AnimatedBuilder(
         animation: Listenable.merge([
@@ -155,12 +182,7 @@ class _SplashScreenState extends State<SplashScreen>
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                colors: [
-                  DarkThemeColors.background,
-                  DarkThemeColors.surface,
-                  DarkThemeColors.surfaceVariant,
-                  DarkThemeColors.primary.withOpacity(0.1),
-                ],
+                colors: backgroundColors,
                 stops: [
                   0.0,
                   0.3 + (_gradientAnimation.value * 0.2),
@@ -172,7 +194,8 @@ class _SplashScreenState extends State<SplashScreen>
             child: Stack(
               children: [
                 // Animated background particles
-                ...List.generate(6, (index) => _buildFloatingParticle(index)),
+                ...List.generate(
+                    6, (index) => _buildFloatingParticle(index, isDark)),
 
                 // Main content
                 Center(
@@ -194,16 +217,15 @@ class _SplashScreenState extends State<SplashScreen>
                                   begin: Alignment.topLeft,
                                   end: Alignment.bottomRight,
                                   colors: [
-                                    DarkThemeColors.primary,
-                                    DarkThemeColors.secondary,
-                                    DarkThemeColors.accent1,
+                                    primaryColor,
+                                    secondaryColor,
+                                    accentColor,
                                   ],
                                 ),
                                 borderRadius: BorderRadius.circular(30),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: DarkThemeColors.primary
-                                        .withOpacity(0.3),
+                                    color: primaryColor.withOpacity(0.3),
                                     blurRadius: 20,
                                     spreadRadius: 5,
                                   ),
@@ -229,13 +251,13 @@ class _SplashScreenState extends State<SplashScreen>
                           child: ShaderMask(
                             shaderCallback: (bounds) => LinearGradient(
                               colors: [
-                                DarkThemeColors.primary,
-                                DarkThemeColors.secondary,
-                                DarkThemeColors.accent1,
+                                primaryColor,
+                                secondaryColor,
+                                accentColor,
                               ],
                             ).createShader(bounds),
                             child: Text(
-                              'Social Connect', // Updated app name
+                              'Social Connect',
                               style: GoogleFonts.poppins(
                                 fontSize: 32,
                                 fontWeight: FontWeight.bold,
@@ -265,7 +287,7 @@ class _SplashScreenState extends State<SplashScreen>
                             style: GoogleFonts.poppins(
                               fontSize: 16,
                               fontWeight: FontWeight.w400,
-                              color: DarkThemeColors.textSecondary,
+                              color: textSecondary,
                             ),
                           ),
                         ),
@@ -281,14 +303,14 @@ class _SplashScreenState extends State<SplashScreen>
                           height: 4,
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(2),
-                            color: DarkThemeColors.surface,
+                            color: colorScheme.surface,
                           ),
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(2),
                             child: LinearProgressIndicator(
                               backgroundColor: Colors.transparent,
                               valueColor: AlwaysStoppedAnimation<Color>(
-                                DarkThemeColors.primary,
+                                primaryColor,
                               ),
                             ),
                           ),
@@ -305,7 +327,7 @@ class _SplashScreenState extends State<SplashScreen>
                           style: GoogleFonts.poppins(
                             fontSize: 14,
                             fontWeight: FontWeight.w300,
-                            color: DarkThemeColors.textHint,
+                            color: textHint,
                           ),
                         ),
                       ),
@@ -320,12 +342,27 @@ class _SplashScreenState extends State<SplashScreen>
     );
   }
 
-  Widget _buildFloatingParticle(int index) {
-    // ignore: unused_local_variable
-    final double delay = index * 0.5;
+  Widget _buildFloatingParticle(int index, bool isDark) {
     final double size = 20 + (index * 10);
     final double initialX = (index % 3 - 1) * 100;
     final double initialY = (index % 2 - 0.5) * 200;
+
+    // Theme-aware particle colors
+    final particleColors = isDark
+        ? [
+            DarkThemeColors.primary,
+            DarkThemeColors.secondary,
+            DarkThemeColors.accent1,
+            DarkThemeColors.accent2,
+            DarkThemeColors.accent3,
+          ]
+        : [
+            LightThemeColors.primary,
+            LightThemeColors.secondary,
+            LightThemeColors.accent1,
+            LightThemeColors.accent2,
+            LightThemeColors.accent3,
+          ];
 
     return Positioned(
       left: MediaQuery.of(context).size.width / 2 + initialX,
@@ -347,13 +384,7 @@ class _SplashScreenState extends State<SplashScreen>
                   shape: BoxShape.circle,
                   gradient: RadialGradient(
                     colors: [
-                      [
-                        DarkThemeColors.primary,
-                        DarkThemeColors.secondary,
-                        DarkThemeColors.accent1,
-                        DarkThemeColors.accent2,
-                        DarkThemeColors.accent3,
-                      ][index % 5],
+                      particleColors[index % 5],
                       Colors.transparent,
                     ],
                   ),
