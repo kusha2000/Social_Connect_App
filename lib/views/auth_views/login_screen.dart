@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:social_connect/services/auth/auth_service.dart';
 import 'package:social_connect/utils/app_constants/colors.dart';
+import 'package:social_connect/utils/util_functions/snackbar_functions.dart';
 import 'package:social_connect/widgets/reusable/modern_button.dart';
 import 'package:social_connect/widgets/reusable/modern_input.dart';
 import 'package:social_connect/utils/app_constants/constants.dart';
@@ -123,24 +124,12 @@ class _LoginScreenState extends State<LoginScreen>
       }
     } catch (e) {
       if (mounted) {
-        _showErrorSnackBar(
+        SnackBarFunctions.showErrorSnackBar(
             context, 'Invalid email or password. Please try again.');
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
-  }
-
-  void _showErrorSnackBar(BuildContext context, String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: AppColors.error,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        margin: const EdgeInsets.all(16),
-      ),
-    );
   }
 
   // Check if current screen is web view

@@ -6,6 +6,7 @@ import 'package:social_connect/models/user_model.dart';
 import 'package:social_connect/services/users/user_service.dart';
 import 'package:social_connect/services/users/user_storage.dart';
 import 'package:social_connect/utils/app_constants/colors.dart';
+import 'package:social_connect/utils/util_functions/snackbar_functions.dart';
 import 'package:social_connect/widgets/reusable/modern_button.dart';
 import 'package:social_connect/widgets/reusable/modern_input.dart';
 
@@ -224,42 +225,19 @@ class _RegisterScreenState extends State<RegisterScreen>
       );
 
       if (mounted) {
-        _showSuccessSnackBar(context, 'Account created successfully!');
+        SnackBarFunctions.showSuccessSnackBar(
+            context, 'Account created successfully!');
         await Future.delayed(const Duration(seconds: 1));
         GoRouter.of(context).go('/main-screen');
       }
     } catch (e) {
       if (mounted) {
-        _showErrorSnackBar(
+        SnackBarFunctions.showErrorSnackBar(
             context, 'Failed to create account. Please try again.');
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
-  }
-
-  void _showErrorSnackBar(BuildContext context, String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: AppColors.error,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        margin: const EdgeInsets.all(16),
-      ),
-    );
-  }
-
-  void _showSuccessSnackBar(BuildContext context, String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: AppColors.success,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        margin: const EdgeInsets.all(16),
-      ),
-    );
   }
 
   Widget _buildMobileLayout(BuildContext context, Size size) {
