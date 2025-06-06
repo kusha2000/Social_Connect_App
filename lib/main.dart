@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:social_connect/views/responsive/mobile_screen_layout.dart';
-import 'package:social_connect/views/responsive/responsive_layout.dart';
-import 'package:social_connect/views/responsive/web_screen_layout.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:social_connect/router/router.dart';
 import 'firebase_options.dart';
+import 'package:social_connect/utils/app_constants/colors.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -19,14 +19,24 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: Scaffold(
-        body: ResponsiveLayout(
-          mobileScreenLayout: MobileScreenLayout(),
-          webScreenLayout: WebScreenLayout(),
-        ),
-      ),
+    return MaterialApp.router(
+      title: 'Socially',
+      theme: ThemeData(
+          fontFamily: GoogleFonts.poppins().fontFamily,
+          brightness: Brightness.dark,
+          bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+            backgroundColor: Colors.transparent,
+            selectedItemColor: mainOrangeColor,
+            unselectedItemColor: mainWhiteColor,
+          ),
+          snackBarTheme: const SnackBarThemeData(
+            backgroundColor: mainOrangeColor,
+            contentTextStyle: TextStyle(
+              color: mainWhiteColor,
+              fontSize: 16,
+            ),
+          )),
+      routerConfig: RouterClass().router,
     );
   }
 }
