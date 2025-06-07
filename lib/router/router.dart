@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:social_connect/models/post_model.dart';
 import 'package:social_connect/views/auth_views/forgot_password_screen.dart';
 import 'package:social_connect/views/auth_views/login_screen.dart';
 import 'package:social_connect/views/auth_views/register_screen.dart';
 import 'package:social_connect/views/main_screen.dart';
+import 'package:social_connect/views/main_views/edit_post_screen.dart';
 import 'package:social_connect/views/responsive/mobile_screen_layout.dart';
 import 'package:social_connect/views/responsive/responsive_layout.dart';
 import 'package:social_connect/views/responsive/web_screen_layout.dart';
@@ -69,6 +71,13 @@ class RouterClass {
         path: "/main-screen",
         builder: (context, state) {
           return const MainScreen();
+        },
+      ),
+      GoRoute(
+        path: '/edit-post',
+        builder: (context, state) {
+          final post = state.extra as Post;
+          return EditPostScreen(post: post);
         },
       ),
     ],
