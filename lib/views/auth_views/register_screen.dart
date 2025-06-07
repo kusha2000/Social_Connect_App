@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:social_connect/models/user_model.dart';
 import 'package:social_connect/services/users/user_service.dart';
-import 'package:social_connect/services/users/user_storage.dart';
+import 'package:social_connect/services/storage/storage.dart';
 import 'package:social_connect/utils/app_constants/colors.dart';
 import 'package:social_connect/utils/util_functions/snackbar_functions.dart';
 import 'package:social_connect/widgets/reusable/modern_button.dart';
@@ -201,7 +201,7 @@ class _RegisterScreenState extends State<RegisterScreen>
     try {
       // Store the user image in storage and get the download url
       if (_imageFile != null) {
-        final imageUrl = await UserProfileStorageService().uploadImage(
+        final imageUrl = await StorageService().uploadImage(
           profileImage: _imageFile!,
           userEmail: _emailController.text,
           imageType: "profile",

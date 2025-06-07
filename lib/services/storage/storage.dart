@@ -1,11 +1,12 @@
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:cloudinary/cloudinary.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-class UserProfileStorageService {
+class StorageService {
   late Cloudinary _cloudinary;
 
-  UserProfileStorageService() {
+  StorageService() {
     _initializeCloudinary();
   }
 
@@ -26,17 +27,14 @@ class UserProfileStorageService {
     );
   }
 
-  /// Returns the secure URL of the uploaded image
+  /// Upload image from File (mobile) - existing method
   Future<String> uploadImage({
     required File profileImage,
     required String userEmail,
-    String imageType = 'profile', // 'profile' or 'post'
+    String imageType = 'profile',
   }) async {
     try {
-      // Create folder path: email/profile or email/post
       final folderPath = '$userEmail/$imageType';
-
-      // Generate unique filename with timestamp
       final timestamp = DateTime.now().millisecondsSinceEpoch;
       final fileName = '${imageType}_$timestamp';
 
@@ -59,13 +57,65 @@ class UserProfileStorageService {
     }
   }
 
+  /// Upload image from Uint8List (web) - new method
+  Future<String> uploadImageFromBytes({
+    required Uint8List imageBytes,
+    required String userEmail,
+    String imageType = 'profile',
+  }) async {
+    try {
+      final folderPath = '$userEmail/$imageType';
+      final timestamp = DateTime.now().millisecondsSinceEpoch;
+      final fileName = '${imageType}_$timestamp';
+
+      final response = await _cloudinary.upload(
+        fileBytes: imageBytes,
+        resourceType: CloudinaryResourceType.image,
+        folder: folderPath,
+        publicId: fileName,
+      );
+
+      if (response.isSuccessful) {
+        print("response:$response");
+        return response.secureUrl ?? response.url ?? '';
+      } else {
+        throw Exception('Failed to upload image: ${response.error}');
+      }
+    } catch (e) {
+      throw Exception('Error uploading image: $e');
+    }
+  }
+
+  /// Universal upload method that handles both File and Uint8List
+  Future<String> uploadImageUniversal({
+    File? imageFile,
+    Uint8List? imageBytes,
+    required String userEmail,
+    String imageType = 'profile',
+  }) async {
+    if (imageFile != null) {
+      return uploadImage(
+        profileImage: imageFile,
+        userEmail: userEmail,
+        imageType: imageType,
+      );
+    } else if (imageBytes != null) {
+      return uploadImageFromBytes(
+        imageBytes: imageBytes,
+        userEmail: userEmail,
+        imageType: imageType,
+      );
+    } else {
+      throw Exception('Either imageFile or imageBytes must be provided');
+    }
+  }
+
   Future<bool> deleteImage({
     required String imageUrl,
     required String userEmail,
     String imageType = 'profile',
   }) async {
     try {
-      // Extract public ID from URL
       final publicId = _extractPublicIdFromUrl(imageUrl, userEmail, imageType);
 
       if (publicId == null) {
@@ -87,7 +137,6 @@ class UserProfileStorageService {
       final uri = Uri.parse(url);
       final pathSegments = uri.pathSegments;
 
-      // Find the segment after 'upload' or 'image/upload'
       int uploadIndex = -1;
       for (int i = 0; i < pathSegments.length; i++) {
         if (pathSegments[i] == 'upload') {
@@ -100,7 +149,6 @@ class UserProfileStorageService {
         return null;
       }
 
-      // Skip version if present (starts with 'v')
       int startIndex = uploadIndex + 1;
       if (pathSegments[startIndex].startsWith('v') &&
           pathSegments[startIndex].length > 1 &&
@@ -108,11 +156,9 @@ class UserProfileStorageService {
         startIndex++;
       }
 
-      // Get remaining path segments and join them
       final remainingSegments = pathSegments.sublist(startIndex);
       String publicId = remainingSegments.join('/');
 
-      // Remove file extension
       final lastDotIndex = publicId.lastIndexOf('.');
       if (lastDotIndex != -1) {
         publicId = publicId.substring(0, lastDotIndex);

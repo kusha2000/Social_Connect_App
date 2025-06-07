@@ -7,6 +7,7 @@ class Post {
   final String userId;
   final String username;
   final int likes;
+  final int comments;
   final String postId;
   final DateTime datePublished;
   final String postUrl;
@@ -18,6 +19,7 @@ class Post {
     required this.userId,
     required this.username,
     required this.likes,
+    required this.comments,
     required this.postId,
     required this.datePublished,
     required this.postUrl,
@@ -32,6 +34,7 @@ class Post {
       'userId': userId,
       'username': username,
       'likes': likes,
+      'comments': comments,
       'postId': postId,
       'datePublished': Timestamp.fromDate(datePublished),
       'postUrl': postUrl,
@@ -47,6 +50,7 @@ class Post {
       userId: json['userId'] ?? '',
       username: json['username'] ?? '',
       likes: json['likes'] ?? 0,
+      comments: json['comments'] ?? 0,
       postId: json['postId'] ?? '',
       datePublished: (json['datePublished'] as Timestamp).toDate(),
       postUrl: json['postUrl'] ?? '',
