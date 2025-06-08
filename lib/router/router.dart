@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:social_connect/models/post_model.dart';
+import 'package:social_connect/models/user_model.dart';
 import 'package:social_connect/views/auth_views/forgot_password_screen.dart';
 import 'package:social_connect/views/auth_views/login_screen.dart';
 import 'package:social_connect/views/auth_views/register_screen.dart';
 import 'package:social_connect/views/main_screen.dart';
 import 'package:social_connect/views/main_views/edit_post_screen.dart';
+import 'package:social_connect/views/main_views/single_user_screen.dart';
 import 'package:social_connect/views/responsive/mobile_screen_layout.dart';
 import 'package:social_connect/views/responsive/responsive_layout.dart';
 import 'package:social_connect/views/responsive/web_screen_layout.dart';
@@ -78,6 +80,18 @@ class RouterClass {
         builder: (context, state) {
           final post = state.extra as Post;
           return EditPostScreen(post: post);
+        },
+      ),
+
+      //profile screen
+      GoRoute(
+        name: "profile-screen",
+        path: "/profile-screen",
+        builder: (context, state) {
+          final UserModel user = state.extra as UserModel;
+          return SingleUserScreen(
+            user: user,
+          );
         },
       ),
     ],
