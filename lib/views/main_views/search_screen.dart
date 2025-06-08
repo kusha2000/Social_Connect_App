@@ -450,7 +450,7 @@ class _SearchScreenState extends State<SearchScreen>
                 ),
                 const SizedBox(width: 4),
                 Text(
-                  '${_formatFollowerCount(user.followers)} followers',
+                  '${_formatFollowerCount(user.followersCount)} followers',
                   style: TextStyle(
                     color: AppColors.textSecondary,
                     fontSize: 12,
@@ -526,7 +526,7 @@ class _SearchScreenState extends State<SearchScreen>
             ),
             const SizedBox(height: 4),
             Text(
-              '${_formatFollowerCount(user.followers)} followers',
+              '${_formatFollowerCount(user.followersCount)} followers',
               style: TextStyle(
                 color: AppColors.textSecondary,
                 fontSize: 12,

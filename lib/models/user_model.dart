@@ -9,7 +9,8 @@ class UserModel {
   final DateTime createdAt;
   final DateTime updatedAt;
   final String password;
-  final int followers;
+  final int followersCount;
+  final int followingCount;
 
   UserModel({
     required this.userId,
@@ -20,7 +21,8 @@ class UserModel {
     required this.createdAt,
     required this.updatedAt,
     required this.password,
-    required this.followers,
+    required this.followersCount,
+    required this.followingCount,
   });
 
   // Convert a User instance to a map (for saving to Firestore)
@@ -34,7 +36,8 @@ class UserModel {
       'createdAt': createdAt,
       'updatedAt': updatedAt,
       'password': password,
-      'followers': followers,
+      'followersCount': followersCount,
+      'followingCount': followingCount,
     };
   }
 
@@ -49,7 +52,8 @@ class UserModel {
       createdAt: (map['createdAt'] as Timestamp).toDate(),
       updatedAt: (map['updatedAt'] as Timestamp).toDate(),
       password: map['password'] ?? '',
-      followers: map['followers'] ?? 0,
+      followersCount: map['followersCount'] ?? 0,
+      followingCount: map['followingCount'] ?? 0,
     );
   }
 }

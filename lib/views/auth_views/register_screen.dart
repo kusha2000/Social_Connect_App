@@ -220,7 +220,8 @@ class _RegisterScreenState extends State<RegisterScreen>
           createdAt: DateTime.now(),
           updatedAt: DateTime.now(),
           password: _passwordController.text,
-          followers: 0,
+          followersCount: 0,
+          followingCount: 0,
         ),
       );
 
