@@ -5,7 +5,10 @@ class Reel {
   final String videoUrl;
   final String userId;
   final String username;
+  final String userProfilePic;
   final String reelId;
+  final int likes;
+  final int comments;
   final DateTime datePublished;
 
   Reel({
@@ -13,7 +16,10 @@ class Reel {
     required this.videoUrl,
     required this.userId,
     required this.username,
+    required this.userProfilePic,
     required this.reelId,
+    required this.likes,
+    required this.comments,
     required this.datePublished,
   });
 
@@ -24,7 +30,10 @@ class Reel {
       'videoUrl': videoUrl,
       'userId': userId,
       'username': username,
+      'userProfilePic': userProfilePic,
       'reelId': reelId,
+      'likes': likes,
+      'comments': comments,
       'datePublished': Timestamp.fromDate(datePublished),
     };
   }
@@ -36,7 +45,10 @@ class Reel {
       videoUrl: json['videoUrl'] ?? '',
       userId: json['userId'] ?? '',
       username: json['username'] ?? '',
+      userProfilePic: json['userProfilePic'] ?? '',
       reelId: json['reelId'] ?? '',
+      likes: json['likes'] ?? 0,
+      comments: json['comments'] ?? 0,
       datePublished: (json['datePublished'] as Timestamp).toDate(),
     );
   }
