@@ -6,6 +6,7 @@ import 'package:social_connect/views/auth_views/forgot_password_screen.dart';
 import 'package:social_connect/views/auth_views/login_screen.dart';
 import 'package:social_connect/views/auth_views/register_screen.dart';
 import 'package:social_connect/views/main_screen.dart';
+import 'package:social_connect/views/main_views/create_post_screen.dart';
 import 'package:social_connect/views/main_views/edit_post_screen.dart';
 import 'package:social_connect/views/main_views/single_user_screen.dart';
 import 'package:social_connect/views/responsive/mobile_screen_layout.dart';
@@ -73,6 +74,13 @@ class RouterClass {
         path: "/main-screen",
         builder: (context, state) {
           return const MainScreen();
+        },
+      ),
+      GoRoute(
+        name: "create-post",
+        path: "/create-post",
+        builder: (context, state) {
+          return CreatePostScreen();
         },
       ),
       GoRoute(

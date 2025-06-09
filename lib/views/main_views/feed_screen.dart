@@ -436,39 +436,99 @@ class _FeedScreenState extends State<FeedScreen> with TickerProviderStateMixin {
                 slivers: [
                   // Custom App Bar
                   SliverAppBar(
-                    expandedHeight: 100,
-                    floating: true,
+                    expandedHeight: 120.0,
+                    floating: false,
                     pinned: true,
-                    backgroundColor: AppColors.surface.withOpacity(0.9),
-                    flexibleSpace: FlexibleSpaceBar(
-                      background: Container(
-                        decoration: BoxDecoration(
-                          gradient: AppColors.primaryGradient,
+                    elevation: 0,
+                    backgroundColor: Colors.transparent,
+                    flexibleSpace: Container(
+                      decoration: const BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [
+                            Color(0xFF667eea),
+                            Color(0xFF764ba2),
+                            Color(0xFFf093fb),
+                          ],
                         ),
-                        child: SafeArea(
-                          child: Padding(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: isWeb ? 32 : 16,
-                              vertical: 16,
+                      ),
+                      child: FlexibleSpaceBar(
+                        centerTitle: true,
+                        title: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.play_circle_fill,
+                              color: Colors.white,
+                              size: 28,
                             ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  'Social Feed',
-                                  style: TextStyle(
-                                    fontSize: isWeb ? 32 : 28,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
-                                  ),
-                                ),
+                            const SizedBox(width: 8),
+                            const Text(
+                              'Feeds',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 1.2,
+                              ),
+                            ),
+                          ],
+                        ),
+                        background: Container(
+                          decoration: const BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [
+                                Color(0xFF667eea),
+                                Color(0xFF764ba2),
+                                Color(0xFFf093fb),
                               ],
                             ),
                           ),
                         ),
                       ),
                     ),
+                    actions: [
+                      // Beautiful Create Reel Button
+                      Container(
+                        margin:
+                            const EdgeInsets.only(right: 16, top: 8, bottom: 8),
+                        child: ElevatedButton.icon(
+                          onPressed: () {
+                            GoRouter.of(context).push('/create-post');
+                          },
+                          icon: const Icon(
+                            Icons.add_circle_outline,
+                            color: Colors.white,
+                            size: 20,
+                          ),
+                          label: const Text(
+                            'Create',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.white.withOpacity(0.2),
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(25),
+                              side: BorderSide(
+                                color: Colors.white.withOpacity(0.3),
+                                width: 1,
+                              ),
+                            ),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 8,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
 
                   // Posts List
