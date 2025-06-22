@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import 'package:social_connect/models/user_model.dart';
 import 'package:social_connect/services/auth/auth_service.dart';
 import 'package:social_connect/services/feed/feed_service.dart';
 import 'package:social_connect/services/users/user_service.dart';
 import 'package:social_connect/utils/app_constants/colors.dart';
+import 'package:social_connect/services/providers/theme_provider.dart';
 import 'dart:async';
 
 class SingleUserScreen extends StatefulWidget {
@@ -23,12 +26,12 @@ class _SingleUserScreenState extends State<SingleUserScreen>
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
   late Animation<Offset> _slideAnimation;
+  late AnimationController _toggleController;
+  late Animation<double> _toggleAnimation;
 
-  // Real-time count streams
   late StreamSubscription<int>? _followersCountSubscription;
   late StreamSubscription<int>? _followingCountSubscription;
 
-  // Real-time count values
   int _followersCount = 0;
   int _followingCount = 0;
 
@@ -40,11 +43,9 @@ class _SingleUserScreenState extends State<SingleUserScreen>
     _userPosts = FeedService().getUserPosts(widget.user.userId);
     _isFollowing = _userService.isFollowing(_currentUserId, widget.user.userId);
 
-    // Initialize counts with static values
     _followersCount = widget.user.followersCount;
     _followingCount = widget.user.followingCount;
 
-    // Set up real-time listeners
     _setupRealTimeListeners();
 
     _animationController = AnimationController(
@@ -68,11 +69,23 @@ class _SingleUserScreenState extends State<SingleUserScreen>
       curve: Curves.easeOutCubic,
     ));
 
+    _toggleController = AnimationController(
+      duration: const Duration(milliseconds: 300),
+      vsync: this,
+    );
+
+    _toggleAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _toggleController,
+        curve: Curves.easeInOut,
+      ),
+    );
+
     _animationController.forward();
+    if (AppColors.isDarkMode) _toggleController.forward();
   }
 
   void _setupRealTimeListeners() {
-    // Listen to followers count changes
     _followersCountSubscription = _userService
         .getFollowersCountStream(widget.user.userId)
         .listen((count) {
@@ -85,7 +98,6 @@ class _SingleUserScreenState extends State<SingleUserScreen>
       print('Error listening to followers count: $error');
     });
 
-    // Listen to following count changes
     _followingCountSubscription = _userService
         .getFollowingCountStream(widget.user.userId)
         .listen((count) {
@@ -102,6 +114,7 @@ class _SingleUserScreenState extends State<SingleUserScreen>
   @override
   void dispose() {
     _animationController.dispose();
+    _toggleController.dispose();
     _followersCountSubscription?.cancel();
     _followingCountSubscription?.cancel();
     super.dispose();
@@ -125,6 +138,16 @@ class _SingleUserScreenState extends State<SingleUserScreen>
       });
     } catch (error) {
       _showSnackBar('Error updating follow status', Icons.error, isError: true);
+    }
+  }
+
+  Future<void> _signOut() async {
+    try {
+      await AuthService().signOut();
+      _showSnackBar('Signed out successfully', Icons.logout);
+      GoRouter.of(context).push('/login');
+    } catch (error) {
+      _showSnackBar('Error signing out', Icons.error, isError: true);
     }
   }
 
@@ -312,13 +335,91 @@ class _SingleUserScreenState extends State<SingleUserScreen>
     );
   }
 
+  Widget _buildToggleSwitch() {
+    return Consumer<ThemeProvider>(
+      builder: (context, themeProvider, child) {
+        return GestureDetector(
+          onTap: () {
+            if (_toggleController.isCompleted) {
+              _toggleController.reverse();
+            } else {
+              _toggleController.forward();
+            }
+            // Use the ThemeProvider to toggle theme
+            themeProvider.toggleTheme();
+          },
+          child: Container(
+            width: 60,
+            height: 34,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(17),
+              gradient: LinearGradient(
+                colors: AppColors.isDarkMode
+                    ? [Colors.grey[800]!, Colors.grey[900]!]
+                    : [Colors.blue[300]!, Colors.blue[500]!],
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.isDarkMode
+                      ? Colors.black.withOpacity(0.3)
+                      : Colors.grey.withOpacity(0.3),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                AnimatedAlign(
+                  alignment: _toggleAnimation.value == 1
+                      ? Alignment.centerRight
+                      : Alignment.centerLeft,
+                  duration: const Duration(milliseconds: 300),
+                  curve: Curves.easeInOut,
+                  child: Padding(
+                    padding: const EdgeInsets.all(3),
+                    child: Container(
+                      width: 28,
+                      height: 28,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color:
+                            AppColors.isDarkMode ? Colors.white : Colors.white,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.2),
+                            blurRadius: 4,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Icon(
+                        AppColors.isDarkMode
+                            ? Icons.nightlight_round
+                            : Icons.wb_sunny,
+                        size: 18,
+                        color: AppColors.isDarkMode
+                            ? Colors.grey[900]
+                            : Colors.yellow[700],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
       body: CustomScrollView(
         slivers: [
-          // Modern App Bar with gradient
           SliverAppBar(
             expandedHeight: 60,
             floating: false,
@@ -334,9 +435,18 @@ class _SingleUserScreenState extends State<SingleUserScreen>
               onPressed: () => Navigator.pop(context),
               icon: Icon(Icons.arrow_back_ios, color: AppColors.textPrimary),
             ),
+            actions: [
+              _buildToggleSwitch(),
+              const SizedBox(width: 16),
+              if (widget.user.userId == _currentUserId)
+                IconButton(
+                  onPressed: _signOut,
+                  icon: Icon(Icons.logout, color: AppColors.textPrimary),
+                  tooltip: 'Sign Out',
+                ),
+              const SizedBox(width: 16),
+            ],
           ),
-
-          // Profile Content
           SliverToBoxAdapter(
             child: FadeTransition(
               opacity: _fadeAnimation,
@@ -344,7 +454,6 @@ class _SingleUserScreenState extends State<SingleUserScreen>
                 position: _slideAnimation,
                 child: Column(
                   children: [
-                    // Profile Header Card
                     Container(
                       margin: const EdgeInsets.all(16),
                       padding: const EdgeInsets.all(24),
@@ -363,7 +472,6 @@ class _SingleUserScreenState extends State<SingleUserScreen>
                       ),
                       child: Column(
                         children: [
-                          // Profile Image with gradient border
                           Container(
                             padding: const EdgeInsets.all(4),
                             decoration: BoxDecoration(
@@ -382,10 +490,7 @@ class _SingleUserScreenState extends State<SingleUserScreen>
                               ),
                             ),
                           ),
-
                           const SizedBox(height: 16),
-
-                          // User Name
                           Text(
                             widget.user.name,
                             style: TextStyle(
@@ -394,10 +499,7 @@ class _SingleUserScreenState extends State<SingleUserScreen>
                               color: AppColors.textPrimary,
                             ),
                           ),
-
                           const SizedBox(height: 20),
-
-                          // Stats Row - Updated with real-time counts
                           FutureBuilder<List<String>>(
                             future: _userPosts,
                             builder: (context, postsSnapshot) {
@@ -420,8 +522,7 @@ class _SingleUserScreenState extends State<SingleUserScreen>
                                   ),
                                   _buildStatCard(
                                     'Followers',
-                                    _followersCount
-                                        .toString(), // Using real-time count
+                                    _followersCount.toString(),
                                     Icons.people,
                                     AppColors.isDarkMode
                                         ? DarkThemeColors.accent3
@@ -430,8 +531,7 @@ class _SingleUserScreenState extends State<SingleUserScreen>
                                   ),
                                   _buildStatCard(
                                     'Following',
-                                    _followingCount
-                                        .toString(), // Using real-time count
+                                    _followingCount.toString(),
                                     Icons.person_add,
                                     AppColors.secondary,
                                     _showFollowingDialog,
@@ -440,10 +540,7 @@ class _SingleUserScreenState extends State<SingleUserScreen>
                               );
                             },
                           ),
-
                           const SizedBox(height: 24),
-
-                          // Follow/Unfollow Button
                           if (widget.user.userId != _currentUserId)
                             FutureBuilder<bool>(
                               future: _isFollowing,
@@ -525,8 +622,6 @@ class _SingleUserScreenState extends State<SingleUserScreen>
                         ],
                       ),
                     ),
-
-                    // Posts Section
                     Container(
                       margin: const EdgeInsets.symmetric(horizontal: 16),
                       padding: const EdgeInsets.all(20),
@@ -686,7 +781,6 @@ class _SingleUserScreenState extends State<SingleUserScreen>
                         ],
                       ),
                     ),
-
                     const SizedBox(height: 32),
                   ],
                 ),

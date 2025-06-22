@@ -1,2 +1,5 @@
 # social_connect
 
+This app is a feature-rich social media platform built for modern content sharing and interaction. Users can register, create and manage posts, like and comment on content, and explore short video reels. It also includes real-time updates and theme switching for a fully dynamic experience.
+
+<h3>Technologies Used</h3> <ul> 🔹 Flutter<br> 🔹 Firebase <br>  🔹 Cloudinary <br></ul> <h3>Features</h3> <ul> ✅ User Authentication: Register and log in securely with Firebase Authentication.<br> ✅ Post Creation & Editing: Users can create, update, or delete posts including text and image content.<br> ✅ Likes & Comments: Engage with content through real-time liking and commenting.<br> ✅ Reels Support: Watch and interact with vertical short-form video content (reels).<br> ✅ Real-Time Updates: All data updates are reflected instantly via Firebase.<br> ✅ Light & Dark Theme: Seamlessly switch between dark and light mode based on user preference.<br> </ul> <h2>This is the Full Demo of the project</h2><br><br>  <h2>This is the screenshots of the system</h2><br><br>

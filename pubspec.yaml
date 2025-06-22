@@ -47,6 +47,7 @@ dependencies:
   image: ^4.5.4
   flutter_dotenv: ^5.2.1
   cloudinary: ^1.2.0
+  shared_preferences: ^2.5.3
 
 dev_dependencies:
   flutter_test:
